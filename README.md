@@ -90,6 +90,29 @@ carrying both reaches 0.750.
 **Robustness**: results hold across different forecast windows and different constructions of the realized
 measure. Full parameter estimates, in-sample diagnostics and the robustness tables are in `Final Report/`.
 
+## Reproduction status
+
+All six fitting scripts execute end to end on the pinned versions in `requirements.txt`
+(verified September 2026, Python 3.13). Data paths resolve relative to the repository, so a plain
+`git clone` is enough.
+
+Two caveats worth stating up front, both about the environment rather than the paper:
+
+- **The baseline specifications reproduce cleanly.** `GARCH` and `GARCH-MIDAS` converge to interior
+  solutions with all parameters significant — see the expected output below.
+- **Two of the richer specifications land on parameter bounds under these versions.** In
+  `GARCH-MIDAS+RV+X`, α and β settle exactly at 0.100 and 0.800, which are the edges of their feasible
+  intervals (0, 0.1) and (0.8, 1), and θ₂ at −5.0; in `RGARCH_MIDAS`, α collapses to ~6.7e-05 with a
+  standard error two orders of magnitude larger than the estimate. Those are boundary solutions, not
+  converged interior optima.
+
+The original estimation was done on Python 3.7 with the SciPy of that era, and the numbers reported in
+the paper come from that environment. SLSQP's behaviour on tightly bounded, near-integrated likelihoods
+is sensitive to the optimizer version, so this is most likely an environment difference rather than a
+disagreement with the published results — but it has not been isolated, and it is stated here rather
+than left for a reader to discover. Reproducing the paper's estimates for those two specifications
+would mean pinning the original environment or re-tuning the starting values and bounds.
+
 ## Units and conventions
 
 Returns are base-10 log returns of the index close, scaled by 100:

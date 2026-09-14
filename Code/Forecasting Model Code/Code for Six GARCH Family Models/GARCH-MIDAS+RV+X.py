@@ -1,6 +1,23 @@
 import os as _os
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.abspath(_os.path.join(_HERE, '..', '..', '..'))
+
+def _data(name):
+    """Resolve a data file: first next to this script, then under Data/."""
+    local = _os.path.join(_HERE, name)
+    if _os.path.exists(local):
+        return local
+    for sub in ('Data',
+                _os.path.join('Data', 'Stock Price and Indicator Data'),
+                _os.path.join('Data', 'Stock Price and Indicator Data',
+                              'Reference Indicator Data')):
+        cand = _os.path.join(_ROOT, sub, name)
+        if _os.path.exists(cand):
+            return cand
+    raise FileNotFoundError(name)
+
 def _out(name):
-    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    d = _os.path.join(_ROOT, 'outputs')
     _os.makedirs(d, exist_ok=True)
     return _os.path.join(d, name)
 
@@ -176,8 +193,8 @@ def f_ml(params, data, indic, rt, rv, rvt, indicator, period1, period2, nobs):
 
 
 if __name__ == '__main__':
-    data_test = pd.read_csv(r'DT50低频.csv',encoding="gbk")
-    data2 = pd.read_csv(r'EPU.csv',encoding="gbk")
+    data_test = pd.read_csv(_data('DT50低频.csv'),encoding="gbk")
+    data2 = pd.read_csv(_data('EPU.csv'),encoding="gbk")
     GEPU_monthly = data2['EPU']#经济政策的不确定性指数
     est_params,variance,long_run, short_run=Garch_Midas_RV_X(data_test, GEPU_monthly, 12, 12)
 

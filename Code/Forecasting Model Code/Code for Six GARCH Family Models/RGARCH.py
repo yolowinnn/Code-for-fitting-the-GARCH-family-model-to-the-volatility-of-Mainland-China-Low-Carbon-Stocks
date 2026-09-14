@@ -1,6 +1,23 @@
 import os as _os
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+_ROOT = _os.path.abspath(_os.path.join(_HERE, '..', '..', '..'))
+
+def _data(name):
+    """Resolve a data file: first next to this script, then under Data/."""
+    local = _os.path.join(_HERE, name)
+    if _os.path.exists(local):
+        return local
+    for sub in ('Data',
+                _os.path.join('Data', 'Stock Price and Indicator Data'),
+                _os.path.join('Data', 'Stock Price and Indicator Data',
+                              'Reference Indicator Data')):
+        cand = _os.path.join(_ROOT, sub, name)
+        if _os.path.exists(cand):
+            return cand
+    raise FileNotFoundError(name)
+
 def _out(name):
-    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    d = _os.path.join(_ROOT, 'outputs')
     _os.makedirs(d, exist_ok=True)
     return _os.path.join(d, name)
 
@@ -105,7 +122,7 @@ def fML(params,rt,rk,nobs):
         logL = np.array([-1e10]*nobs)
     return logL,Variance
 if __name__=='__main__':
-    data = pd.read_csv('DT50低频.csv')
+    data = pd.read_csv(_data('DT50低频.csv'))
     #rt = data.iloc[:,2].values
     #rk = data.iloc[:,3].values
     rt = data["rt"].values
