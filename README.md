@@ -90,6 +90,23 @@ carrying both reaches 0.750.
 **Robustness**: results hold across different forecast windows and different constructions of the realized
 measure. Full parameter estimates, in-sample diagnostics and the robustness tables are in `Final Report/`.
 
+## Units and conventions
+
+Returns are base-10 log returns of the index close, scaled by 100:
+
+```
+rt = 100 · log₁₀(Pₜ / Pₜ₋₁)
+```
+
+This affects how levels are read, not the dynamics. The GARCH persistence parameters (α, β, α+β), the MCS
+comparison, the out-of-sample R² against the historical-mean benchmark and the Pesaran–Timmermann
+directional test are all invariant under a linear rescaling of the return series; ω and the implied
+variance level carry the factor.
+
+For reference when reading the baseline output: an implied unconditional volatility of 0.734 in model
+units is **1.69% daily, ≈26.8% annualised**, consistent with the realised volatility of the index over
+this sample.
+
 ## Repository layout
 
 ```
