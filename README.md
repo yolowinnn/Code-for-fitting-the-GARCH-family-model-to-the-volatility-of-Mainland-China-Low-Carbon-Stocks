@@ -1,76 +1,97 @@
-# Code for Fitting the GARCH Family Model to the Volatility of Mainland China Low Carbon Stocks
+# Mixed-Frequency Investor Sentiment and Stock-Market Volatility: a GARCH-MIDAS Family Study
 
-This repository contains code and resources for fitting the GARCH family models (Generalized Autoregressive Conditional Heteroskedasticity) to model the volatility of stocks in Mainland China, particularly focusing on low-carbon stocks. The analysis aims to understand the volatility dynamics and financial modeling of low-carbon stock indices.
+> 《基于 GARCH-MIDAS 族的混频投资者情绪对股市波动影响》
+> Undergraduate research project, Southwest Jiaotong University — **principal investigator**, 2022–2023.
+> Code, data, empirical output and the final report are all in this repository.
 
-## Description
+---
 
-The main goal of this project is to apply the GARCH family models to the volatility of stocks, with a focus on the low-carbon sector in Mainland China. By using historical stock price data and financial metrics, we analyze volatility patterns and predict future risks, which is crucial for investors and policymakers in the context of low-carbon economic transitions.
+## What this asks
 
-### Topics
-- Data Analysis
-- Financial Modeling
-- GARCH Models
-- Low Carbon Economy
-- Volatility Modeling
+Realized volatility is measured at high frequency; investor sentiment arrives at a different, usually
+lower frequency. Most studies resolve that mismatch by aggregating one series to match the other, which
+discards information. **MIDAS (mixed-data sampling) lets the two frequencies stay where they are.**
 
-## Installation
+The question here: *once you already have realized variance in the model, does investor sentiment still
+carry incremental information about future volatility — and does it survive an honest out-of-sample test?*
 
-To run the code and replicate the analysis, you will need the following software and dependencies:
+Asset universe: a mainland-China low-carbon equity index (DT50). Sentiment is built from social-media
+text at both instantaneous and low frequency (`NDDT_instant`, `nddt_lowf.csv`).
 
-### Prerequisites
-- Python 3.7
-- Libraries:
-  - `numpy`
-  - `pandas`
-  - `matplotlib`
-  - `arch` (for GARCH modeling)
-  - `statsmodels`
+## The model ladder
 
-You can install the required libraries using `pip`:
+Six specifications, each a strict extension of the previous one, so that any gain is attributable:
+
+| Model | Adds | File |
+|---|---|---|
+| `GARCH` | baseline | `Code/Forecasting Model Code/.../GARCH.py` |
+| `RGARCH` | realized measure in the variance equation | `RGARCH.py` |
+| `GARCH-MIDAS` | long-run component at a second frequency | `GARCH-MIDAS.py` |
+| `RGARCH-MIDAS` | realized measure **+** MIDAS long-run component | `RGARCH_MIDAS.py` |
+| `GARCH-MIDAS + RV + X` | exogenous sentiment as a MIDAS regressor | `GARCH-MIDAS+RV+X.py` |
+| **`RGARCH-MIDAS + RV + X`** | **full model — two MIDAS frequency bands + RV + sentiment** | `RGARCH-MIDAS+RV+X.py` |
+
+The full specification carries two separate MIDAS weighting windows (`period1`, `period2`), which is the
+"多混频 / multi-mixed-frequency" part: realized variance and sentiment are allowed to load on the long-run
+component over different horizons rather than being forced to share one.
+
+**The likelihoods are hand-written.** Each model implements its own log-likelihood and is fitted with
+`scipy.optimize.minimize`, with standard errors from a numerical Hessian (`statsmodels.tools.numdiff.approx_hess`)
+rather than calling a packaged GARCH routine. That was deliberate — the Realized-GARCH-MIDAS-X likelihood with
+two Beta weighting schemes is not something an off-the-shelf package exposes.
+
+## How it is evaluated
+
+In-sample fit is not the claim. The out-of-sample suite (MATLAB, `Code/Out-of-Sample Testing Code/`):
+
+- **MCS — Model Confidence Set** (`MCS_test.m`, `MCSPOSS0.m`): which models survive as statistically
+  indistinguishable from the best, rather than just ranking them
+- **Out-of-sample R²** (`Roos2222.m`, `Roos2cw.m`) against the historical-mean benchmark
+- **Clark–West test** (`Perform_CW_test.m`) for nested-model forecast comparison
+- **Pesaran–Timmermann directional test** (`directional_test_fordiff_PT.m`)
+
+Using MCS rather than a single loss ranking matters here: with six nested models and a short sample, a
+point estimate of "best" is not credible on its own.
+
+## Findings
+
+Full results — parameter estimates, MCS membership, out-of-sample R² and the directional tests — are in
+`Final Report/`. The short version: adding a mixed-frequency sentiment regressor on top of a model that
+already contains realized variance improved volatility forecasts, and the gain held up under the
+out-of-sample suite rather than only in-sample.
+
+## Repository layout
+
+```
+Code/
+  Forecasting Model Code/      six GARCH-family specifications (Python)
+  Out-of-Sample Testing Code/  MCS, R²_OOS, Clark–West, PT directional (MATLAB)
+Data/
+  NDDT_instant/                high-frequency sentiment series
+  nddt_lowf.csv                low-frequency sentiment
+  s_index.csv, DT50低频.csv     index price / low-frequency series
+  Prediction Results Data/     model forecasts
+Empirical Evidence/            fitted plots — sentiment index, volatility, returns, price
+Final Report/                  final paper (PDF + DOCX) and project close-out report
+```
+
+## Reproducing
 
 ```bash
-pip install numpy pandas matplotlib arch statsmodels
-Dataset
-The dataset used for this analysis includes historical stock data from Mainland China, specifically focused on low-carbon companies. You can download the dataset from the following link:
+pip install numpy pandas matplotlib statsmodels scipy
+python "Code/Forecasting Model Code/Code for Six GARCH Family Models/RGARCH-MIDAS+RV+X.py"
+```
 
-Low Carbon Stock Dataset
-Once you have the dataset, you can load it into the code using Pandas.
+Out-of-sample tests require MATLAB.
 
-Usage
-To use the code for volatility modeling with the GARCH family model, follow these steps:
+## Notes and limitations
 
-Clone this repository to your local machine:
+- The sentiment series is specific to one Chinese social-media source over one sample window; the result
+  should not be read as a general claim about sentiment and volatility.
+- Sample length limits how much can be asked of a six-model comparison — which is why the MCS is reported
+  rather than a single winner.
+- The final paper is in Chinese.
 
-git clone https://github.com/YOLOWinnnn/Code-for-fitting-the-GARCH-family-model-to-the-volatility-of-Mainland-China-Low-Carbon-Stocks.git
+---
 
-Navigate to the project directory:
-
-cd Code-for-fitting-the-GARCH-family-model-to-the-volatility-of-Mainland-China-Low-Carbon-Stocks
-
-Run the main script to fit a GARCH model:
-
-python garch_volatility_modeling.py
-The script will load the data, preprocess it, and fit the appropriate GARCH model to model the volatility. The results will be displayed and saved in the outputs/ folder.
-
-Results
-The output includes:
-
-Volatility forecasts based on the GARCH model.
-Plots showing historical volatility and predicted volatility.
-Model diagnostics and performance evaluation.
-
-Contributing
-Contributions are welcome! If you would like to contribute to this project, please follow these steps:
-
-Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Commit your changes (git commit -am 'Add new feature').
-Push to the branch (git push origin feature-branch).
-Create a new Pull Request.
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-Acknowledgments
-This work uses the arch package for GARCH modeling.
-Special thanks to the contributors of the dataset and to all who supported this project.
-For any questions or issues, please feel free to open an issue on this repository or contact me at [ljw2556826312@gmail.com].
+*Author: Jiawei Li (李嘉伟) · [github.com/yolowinnn](https://github.com/yolowinnn)*
