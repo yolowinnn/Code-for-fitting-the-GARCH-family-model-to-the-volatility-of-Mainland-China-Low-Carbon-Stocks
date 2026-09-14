@@ -1,7 +1,8 @@
 # Mixed-Frequency Investor Sentiment and Stock-Market Volatility: a GARCH-MIDAS Family Study
 
 > 《基于 GARCH-MIDAS 族的混频投资者情绪对股市波动影响》
-> Undergraduate research project, Southwest Jiaotong University — **principal investigator**, 2022–2023.
+> Undergraduate research project, School of Mathematics, Southwest Jiaotong University — **first author**, 2022–2023.
+> Li Jiawei, Wang Xiang, Jiang Tian-ai.
 > Code, data, empirical output and the final report are all in this repository.
 
 ---
@@ -20,7 +21,7 @@ text at both instantaneous and low frequency (`NDDT_instant`, `nddt_lowf.csv`).
 
 ## The model ladder
 
-Six specifications, each a strict extension of the previous one, so that any gain is attributable:
+The fitting scripts implement six specifications, each a strict extension of the previous one, so that any gain is attributable (the paper evaluates eight, adding two parameterised variants):
 
 | Model | Adds | File |
 |---|---|---|
@@ -55,10 +56,39 @@ point estimate of "best" is not credible on its own.
 
 ## Findings
 
-Full results — parameter estimates, MCS membership, out-of-sample R² and the directional tests — are in
-`Final Report/`. The short version: adding a mixed-frequency sentiment regressor on top of a model that
-already contains realized variance improved volatility forecasts, and the gain held up under the
-out-of-sample suite rather than only in-sample.
+Eight specifications were compared out of sample (the repository ships six fitting scripts; two further
+variants are parameterisations of them).
+
+**Model Confidence Set**, 90% confidence, so a model survives at p > 0.1:
+
+| | HMSE (T_R / T_SQ) | HMAE (T_R / T_SQ) |
+|---|---|---|
+| GARCH | 0.215 / 0.124 | 0.194 / 0.096 |
+| RGARCH | 0.215 / 0.096 | 0.194 / 0.081 |
+| GARCH-MIDAS | 0.215 / 0.112 | 0.194 / 0.093 |
+| RGARCH-MIDAS | 0.205 / 0.088 | 0.194 / 0.076 |
+| GARCH-MIDAS-X | 0.215 / 0.236 | 0.194 / 0.125 |
+| **RGARCH-MIDAS-RV-X** | **1.000** | **1.000** |
+
+Most models survive the MCS under HMSE/HMAE, which is the honest reading: on this sample the family as a
+whole forecasts this index reasonably. What separates the full specification is that it sits at p = 1 under
+both loss functions — it is the model the others are being measured against, not merely one that survived.
+Under QLIKE, MSE and MAE the simpler models are rejected outright.
+
+**Directional accuracy** (Pesaran–Timmermann), full out-of-sample window:
+
+| Model | Success rate | PT statistic | p |
+|---|---|---|---|
+| RGARCH-MIDAS+X | 0.718 | 11.838 | 0.000 |
+| GARCH-MIDAS+RV+X | 0.720 | 11.709 | 0.000 |
+| **RGARCH-MIDAS+RV+X** | **0.750** | **13.165** | 0.000 |
+
+The two ablations are the interesting comparison: dropping either the realized measure or the intraday
+high-frequency channel costs roughly three percentage points of directional accuracy, and only the model
+carrying both reaches 0.750.
+
+**Robustness**: results hold across different forecast windows and different constructions of the realized
+measure. Full parameter estimates, in-sample diagnostics and the robustness tables are in `Final Report/`.
 
 ## Repository layout
 
