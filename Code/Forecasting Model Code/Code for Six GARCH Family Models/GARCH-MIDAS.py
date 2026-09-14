@@ -1,3 +1,9 @@
+import os as _os
+def _out(name):
+    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
 # -*- coding: utf-8 -*-
 """
 Created on Sun Mar 21 22:41:38 2021
@@ -165,7 +171,7 @@ import pandas as pd
 date=date[insample:]
 d=[yf,Variance_f]
 df = pd.DataFrame({'v':yf, 'GARCH-MIDAS':Variance_f},index=date)
-df.to_csv('C:/Users/a/Desktop/DT50样本外/3.csv')
+df.to_csv(_out(r'3.csv'))
 
 
 

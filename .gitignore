@@ -1,0 +1,5 @@
+*.zip
+*.rar
+__pycache__/
+outputs/
+.DS_Store

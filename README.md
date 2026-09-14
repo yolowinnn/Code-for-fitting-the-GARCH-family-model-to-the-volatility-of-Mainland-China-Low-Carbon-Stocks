@@ -108,11 +108,28 @@ Final Report/                  final paper (PDF + DOCX) and project close-out re
 ## Reproducing
 
 ```bash
-pip install numpy pandas matplotlib statsmodels scipy
-python "Code/Forecasting Model Code/Code for Six GARCH Family Models/RGARCH-MIDAS+RV+X.py"
+pip install -r requirements.txt
+python example.py
 ```
 
-Out-of-sample tests require MATLAB.
+`example.py` fits the baseline GARCH(1,1) on the DT50 series and prints the parameter table with standard
+errors, AIC/HQ, and in/out-of-sample forecast MSE — about thirty seconds, no configuration. Expected output:
+
+```
+DT50 low-carbon index — 2691 daily observations, 1883 in sample / 808 out of sample
+
+         result    stderr        stat   p_value
+mu     0.019482  0.011264    1.729545  0.041938
+omega  0.001681  0.000719    2.337060  0.009770
+alpha  0.052311  0.007405    7.063942  0.000000
+beta   0.944567  0.007154  132.028078  0.000000
+
+Persistence check: alpha + beta = 0.9969
+```
+
+The remaining specifications are in `Code/Forecasting Model Code/`; the MIDAS variants additionally take an
+exogenous indicator series and two MIDAS window lengths. Out-of-sample tests (MCS, R²_OOS, Clark–West,
+Pesaran–Timmermann) are MATLAB and live in `Code/Out-of-Sample Testing Code/`.
 
 ## Notes and limitations
 

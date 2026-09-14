@@ -1,3 +1,9 @@
+import os as _os
+def _out(name):
+    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
 # -*- coding: utf-8 -*-
 
 from numpy import array,nan, inf, nanmean, nansum, zeros, ones, arange, \
@@ -188,7 +194,7 @@ Variance_f = variance[sample:]
 
 d=[yf,Variance_f]
 df = pd.DataFrame({'v':yf, 'GARCH-MIDAS+RV+X':Variance_f},index=date)
-df.to_csv('C:/Users/赵晨晨/Desktop/DT50样本外/7.csv')
+df.to_csv(_out(r'7.csv'))
 
 import matplotlib.pylab as plt
 plt.subplot(311)

@@ -1,3 +1,9 @@
+import os as _os
+def _out(name):
+    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Oct  5 22:32:23 2019
@@ -165,4 +171,4 @@ if __name__=='__main__':
 
     d = [yf, Variance_f]
     df = pd.DataFrame({'v': yf, 'RGARCH-MIDAS': Variance_f})
-    df.to_csv('C:/Users/a/Desktop/DT50样本外/4.csv')
+    df.to_csv(_out(r'4.csv'))

@@ -1,3 +1,9 @@
+import os as _os
+def _out(name):
+    d = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..', '..', '..', 'outputs')
+    _os.makedirs(d, exist_ok=True)
+    return _os.path.join(d, name)
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Nov 23 10:42:53 2019
@@ -103,4 +109,4 @@ plt.show()
 
 d = [yf, Variance_f]
 df = pd.DataFrame({'v': yf, 'GARCH': Variance_f})
-df.to_csv('C:/Users/a/Desktop/DT50样本外/1.csv')
+df.to_csv(_out(r'1.csv'))
